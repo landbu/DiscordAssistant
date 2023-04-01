@@ -1,1 +1,1 @@
-print("FÖR I HELVETE FUNGERA!")
+print("Jävla fucking git, gå och skär dig själv")
