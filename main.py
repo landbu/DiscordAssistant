@@ -1,0 +1,1 @@
+print("FÖR I HELVETE FUNGERA!")
