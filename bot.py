@@ -17,15 +17,19 @@ class MyClient(discord_commands.Bot):
         super().__init__(command_prefix="Fixa så det inte krashar senare", intents=intents, **options)
 
     async def on_ready(self):
-        print("Running")
+        print(f"Running {self.user} ({self.assistant.name})")
 
     async def handle_cmd(self, ctx):
-        split_msg = ctx.content.split(" ")
-        print("Trying to print intersect",self.cmds_set.intersection(set(split_msg)))
-        print("Trying to print split sets", self.cmds_set, set(split_msg))
-        indx = split_msg.index(list(self.cmds_set.intersection(set(split_msg)))[0])
-        command, arg = split_msg[indx], split_msg[indx+1]
-        await self.cmds[command](arg,ctx)
+        try:
+            split_msg = ctx.content.split(" ")
+            print("Trying to print intersect",self.cmds_set.intersection(set(split_msg)))
+            print("Trying to print split sets", self.cmds_set, set(split_msg))
+            indx = split_msg.index(list(self.cmds_set.intersection(set(split_msg)))[0])
+            command, arg = split_msg[indx], split_msg[indx+1]
+            await self.cmds[command](arg,ctx)
+        except Exception as e:
+            print("Failed to handle command", ctx.content, e)
+            self.cm.impossible_command(ctx)
 
     async def conversation(self, ctx):
         response = self.cm.conduct_conversation(ctx) #kanske borde awaitas?
@@ -45,7 +49,7 @@ class MyClient(discord_commands.Bot):
 def run_discord_bot(TOKEN):
     INTENTS = discord.Intents.default()
     INTENTS.message_content = True
-    ASSISTANT = assistants.Veronica
+    ASSISTANT = assistants.Britta           #Change to change assistant
     client = MyClient(ASSISTANT, intents=INTENTS)
     client.run(TOKEN)
 

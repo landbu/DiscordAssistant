@@ -23,8 +23,10 @@ class Conversation_machine:
         self.max_prompt_len = max_prompt_len
 
     def reset_context(self, summarization=False):
-        if not summarization: self.context = self.base_context()
-        else: self.context = get_base_context(self.assistant, self.org, summarization=summarization)
+        if not summarization: self.context = self.base_context
+        else:
+            print(summarization)
+            self.context = get_base_context(self.assistant, self.org, summarization="This is what has happened so far in this conversation: "+summarization.strip(f"{self.assistant.name}: "))
 
 
     def conduct_conversation(self, msg):
@@ -55,13 +57,13 @@ class Conversation_machine:
             print("I failed completing yt thing",e)
             return "FAILED"
 
-    def impossible_command(self,msg):
+    def impossible_command(self,msg): #Den gör ingen completion???
         response = "Sorry, I cannot interpret that command :(\nDouble check your syntax. Remember, start with a '£' and end with a '.'."
         self.context.extend([{"role":"user", "content":f"{msg.author}: {msg.content}"}, \
                              {"role":"user", "content":f"Veronica: {response}"}])
         return response
     
-    def conversation_check(self): #returns "" om conversationen är slut "\nConversation ended" otherwise
+    def conversation_check(self): #returns "" om conversationen är slut "\nConversation ended" otherwise        
         conv_so_far = "\n".join([i["content"]+"\n" for i in self.context[2:]])
         ret_str = ""
 
@@ -75,10 +77,10 @@ class Conversation_machine:
         
         answer = ai.ChatCompletion.create(model="gpt-3.5-turbo", messages=prompt)
         answer = answer.choices[0].message.content
+
         if answer.lower() in ["yes", "yes."]:
             self.reset_context()
             ret_str ="\n*Conversation ended*"
-        else: ret_str = ""
         return ret_str
 
 
